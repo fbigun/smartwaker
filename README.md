@@ -136,6 +136,95 @@ controlled:
 - `status` - 请求立即发送一次状态报告
 - `info` - 请求发送设备基本信息
 
+## 巴法云MQTT服务配置示例
+
+[巴法云](https://cloud.bemfa.com)是一个国内的物联网云平台，提供了MQTT服务。以下是使用巴法云MQTT服务的配置示例：
+
+### 巴法云MQTT服务信息
+
+- 服务器地址：bemfa.com
+- 普通端口：9501
+- 加密端口（TLS）：9503
+- WebSocket端口：9504（路径：/wss）
+
+### 配置示例
+
+#### 控制端模式配置
+
+```yaml
+mode: "controller"
+
+# 巴法云MQTT服务器配置
+mqtt:
+  broker: "tcp://bemfa.com:9501"  # 使用普通端口
+  client_id: "your_private_key"   # 使用您在巴法云获取的私钥作为客户端ID
+  topic: "your_topic_id"          # 您在巴法云控制台创建的主题ID
+  # 认证配置
+  auth:
+    enabled: false                # 方式一：使用私钥作为客户端ID时不需要认证
+    # 方式二：如果客户端ID不匹配，可以使用appID和secretKey认证
+    # enabled: true
+    # username: "your_appID"       # 您的appID
+    # password: "your_secretKey"   # 您的secretKey
+  # MQTT版本配置（巴法云支持MQTT 3.1.1）
+  version: 4
+  qos: 1
+  clean_session: true
+  keep_alive: 60
+  
+  # TLS/SSL配置（如果使用加密端口9503）
+  tls:
+    enabled: false                # 普通端口不需要TLS
+    # 如果使用加密端口，请设置为true
+    # enabled: true
+    # insecure_skip_verify: true    # 如果不需要验证服务器证书
+
+# 设备配置
+devices:
+  - name: "NAS1"
+    mac: "00:11:22:33:44:55"
+    ip: "192.168.1.100"
+    port: 9
+```
+
+#### 被控端模式配置
+
+```yaml
+mode: "controlled"
+
+# 巴法云MQTT服务器配置
+mqtt:
+  broker: "tcp://bemfa.com:9501"
+  client_id: "your_private_key"
+  topic: "your_topic_id"
+  auth:
+    enabled: false
+  version: 4
+  qos: 1
+  clean_session: true
+  keep_alive: 60
+
+# 被控端配置
+controlled:
+  status_topic: "your_topic_id/up"  # 使用/up后缀只更新云端数据
+  status_interval: 60
+  device_name: "MyNAS"
+```
+
+### 使用巴法云的注意事项
+
+1. **主题创建**：使用前需要在[巴法云MQTT控制台](https://cloud.bemfa.com/mdevice.php)创建主题。
+
+2. **消息发布规则**：
+   - 使用 `topic/set` 向所有订阅这个主题的设备推送消息（除了发送者自己）
+   - 使用 `topic/up` 只更新云端数据，不进行推送
+
+3. **连接认证**：
+   - 方式一：使用私钥作为客户端ID，用户名和密码可为空
+   - 方式二：使用appID作为用户名，secretKey作为密码进行认证
+
+4. **QoS限制**：巴法云支持QoS 0和QoS 1，但不支持QoS 2，使用QoS 2可能导致账号异常
+
 ## 依赖项
 
 - github.com/eclipse/paho.mqtt.golang - MQTT客户端库

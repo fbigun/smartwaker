@@ -1,0 +1,45 @@
+mode: "controller"  # controller 或 controlled
+
+# 巴法云MQTT服务器配置
+mqtt:
+  broker: "tcp://bemfa.com:9501"  # 使用普通端口，加密端口为"ssl://bemfa.com:9503"
+  client_id: "your_private_key"   # 使用您在巴法云获取的私钥作为客户端ID
+  topic: "your_topic_id"          # 您在巴法云控制台创建的主题ID
+  
+  # 认证配置
+  auth:
+    enabled: false                # 方式一：使用私钥作为客户端ID时不需要认证
+    # 方式二：如果客户端ID不匹配，可以使用appID和secretKey认证
+    # enabled: true
+    # username: "your_appID"       # 您的appID
+    # password: "your_secretKey"   # 您的secretKey
+  
+  # MQTT版本配置（巴法云支持MQTT 3.1.1）
+  version: 4
+  
+  # QoS配置（巴法云支持QoS 0和QoS 1，不支持QoS 2）
+  qos: 1
+  
+  # 连接配置
+  clean_session: true
+  keep_alive: 60
+  
+  # TLS/SSL配置（如果使用加密端口9503）
+  tls:
+    enabled: false                # 普通端口不需要TLS
+    # 如果使用加密端口，请设置为true
+    # enabled: true
+    # insecure_skip_verify: true    # 如果不需要验证服务器证书
+
+# 设备配置（用于控制端模式）
+devices:
+  - name: "NAS1"                  # 设备名称
+    mac: "00:11:22:33:44:55"      # 设备MAC地址
+    ip: "192.168.1.100"           # 设备IP地址
+    port: 9                       # WOL Magic Packet端口
+
+# 被控端配置（用于被控端模式）
+controlled:
+  status_topic: "your_topic_id/up"  # 使用/up后缀只更新云端数据
+  status_interval: 60               # 状态上报间隔(秒)
+  device_name: "MyNAS"              # 设备名称
