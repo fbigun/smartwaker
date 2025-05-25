@@ -1,0 +1,115 @@
+name: Release
+
+on:
+  push:
+    # 当推送到 main 分支或带有 v* 的标签时触发
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build and Release
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            os_name: linux
+            ext: ""
+          - os: windows-latest
+            os_name: windows
+            ext: ".exe"
+          - os: macos-latest
+            os_name: darwin
+            ext: ""
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+    
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+      
+      - name: Get dependencies
+        run: go mod download
+      
+      - name: Build
+        env:
+          CGO_ENABLED: 0
+          GOOS: ${{ matrix.os_name }}
+          GOARCH: amd64
+        run: |
+          VERSION=$(git describe --tags --always --dirty='-dev')
+          COMMIT_HASH=$(git rev-parse --short HEAD 2>/dev/null)
+          BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          
+          go build -v -ldflags="-X 'main.version=$VERSION' -X 'main.commit=$COMMIT_HASH' -X 'main.date=$BUILD_DATE'" \
+            -o bin/smartwaker-${{ matrix.os_name }}-amd64${{ matrix.ext }} ./cmd
+          
+          # 创建校验和文件
+          if [ "${{ matrix.os_name }}" = "windows" ]; then
+            Get-FileHash -Algorithm SHA256 -Path "bin/smartwaker-${{ matrix.os_name }}-amd64${{ matrix.ext }}" | \
+              Select-Object -ExpandProperty Hash | \
+              Out-File -FilePath "bin/smartwaker-${{ matrix.os_name }}-amd64${{ matrix.ext }}.sha256" -Encoding ASCII
+          else
+            shasum -a 256 "bin/smartwaker-${{ matrix.os_name }}-amd64${{ matrix.ext }}" > "bin/smartwaker-${{ matrix.os_name }}-amd64${{ matrix.ext }}.sha256"
+          fi
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: smartwaker-binaries
+          path: |
+            bin/smartwaker-*
+            bin/smartwaker-*.sha256
+          if-no-files-found: error
+    
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: smartwaker-binaries
+          path: release
+      
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          body: |
+            ## SmartWaker ${{ github.ref_name }}
+            
+            ### Changes
+            - Initial release
+            
+            ### Assets
+            This release includes the following binaries:
+            - `smartwaker-linux-amd64` - Linux 64-bit
+            - `smartwaker-windows-amd64.exe` - Windows 64-bit
+            - `smartwaker-darwin-amd64` - macOS 64-bit
+            
+            Each binary comes with a corresponding `.sha256` checksum file.
+          draft: false
+          prerelease: false
+          files: |
+            release/smartwaker-*
+            release/smartwaker-*.sha256

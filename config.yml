@@ -1,0 +1,47 @@
+mode: "controller"  # controller 或 controlled
+
+# MQTT服务器配置
+mqtt:
+  broker: "tcp://broker.hivemq.com:1883"
+  client_id: "smartwaker_client"
+  topic: "nas/wake"
+  # 认证配置
+  auth:
+    enabled: false    # 是否启用认证
+    username: ""      # MQTT用户名
+    password: ""      # MQTT密码
+    # MQTT v5 增强认证
+    enhanced:
+      enabled: false  # 是否启用增强认证
+      auth_method: "" # 认证方法
+      auth_data: ""   # 认证数据
+  # MQTT版本配置
+  version: 4          # MQTT版本: 3 (v3.1.1), 4 (v3.1.1), 5 (v5.0)
+  
+  # QoS配置
+  qos: 1              # QoS级别: 0, 1, 2
+  
+  # 连接配置
+  clean_session: true # 是否清除会话
+  keep_alive: 60      # 保持连接时间(秒)
+  
+  # TLS/SSL配置
+  tls:
+    enabled: false    # 是否启用TLS
+    ca_cert: ""       # CA证书路径
+    client_cert: ""   # 客户端证书路径
+    client_key: ""    # 客户端密钥路径
+    insecure_skip_verify: false # 是否跳过证书验证
+
+# 设备配置（用于控制端模式）
+devices:
+  - name: "NAS1"      # 设备名称
+    mac: "00:11:22:33:44:55"  # MAC地址
+    ip: "192.168.1.100"       # IP地址
+    port: 9           # WOL Magic Packet端口
+
+# 被控端配置（用于被控端模式）
+controlled:
+  status_topic: "nas/status"  # 状态上报主题
+  status_interval: 60         # 状态上报间隔(秒)
+  device_name: "MyNAS"        # 设备名称
