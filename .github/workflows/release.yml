@@ -89,6 +89,7 @@ jobs:
     
   release:
     name: Create Release
+    if: startsWith(github.ref, 'refs/tags/')
     needs: build
     runs-on: ubuntu-latest
     
@@ -109,7 +110,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
           body: |
             ## SmartWaker ${{ github.ref_name }}
