@@ -46,8 +46,6 @@ func PingHost(host string) (bool, time.Duration, error) {
 		return false, 0, fmt.Errorf("ping error: %w, output: %s", err, outputStr)
 	}
 
-	// 解析输出以获取ping响应时间
-	outputStr := string(output)
 	// 简单地返回执行命令的时间作为RTT
 	// 可以进一步解析输出以获取更准确的RTT
 	return true, pingDuration, nil

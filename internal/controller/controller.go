@@ -3,7 +3,6 @@ package controller
 import (
 	"fmt"
 	"log"
-	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/fbigun/smartwaker/internal/config"
@@ -30,7 +29,7 @@ func Start(cfg *config.Config) (func(), error) {
 	ctrl.mqtt = client
 
 	// 订阅控制主题
-	if err := client.Subscribe(cfg.MQTT.Topic, byte(cfg.MQTT.QoS), ctrl.handleMessage); err != nil {
+	if err := client.Subscribe(cfg.MQTT.Topic, byte(cfg.MQTT.QoS)); err != nil {
 		client.Disconnect()
 		return nil, fmt.Errorf("failed to subscribe to topic: %w", err)
 	}

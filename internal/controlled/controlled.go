@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"runtime"
 	"time"
@@ -70,7 +71,7 @@ func Start(cfg *config.Config) (func(), error) {
 	c.mqtt = client
 
 	// 订阅控制主题
-	if err := client.Subscribe(cfg.MQTT.Topic, byte(cfg.MQTT.QoS), nil); err != nil {
+	if err := client.Subscribe(cfg.MQTT.Topic, byte(cfg.MQTT.QoS)); err != nil {
 		client.Disconnect()
 		return nil, fmt.Errorf("failed to subscribe to topic: %w", err)
 	}
