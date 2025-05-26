@@ -41,7 +41,8 @@ jobs:
       - name: Get dependencies
         run: go mod download
       
-      - name: Build
+      - name: Build (Linux/macOS)
+        if: matrix.os != 'windows-latest'
         env:
           CGO_ENABLED: 0
           GOOS: ${{ matrix.os_name }}
@@ -55,13 +56,27 @@ jobs:
             -o bin/smartwaker-${{ matrix.os_name }}-amd64${{ matrix.ext }} ./cmd
           
           # 创建校验和文件
-          if [ "${{ matrix.os_name }}" = "windows" ]; then
-            Get-FileHash -Algorithm SHA256 -Path "bin/smartwaker-${{ matrix.os_name }}-amd64${{ matrix.ext }}" | \
-              Select-Object -ExpandProperty Hash | \
-              Out-File -FilePath "bin/smartwaker-${{ matrix.os_name }}-amd64${{ matrix.ext }}.sha256" -Encoding ASCII
-          else
-            shasum -a 256 "bin/smartwaker-${{ matrix.os_name }}-amd64${{ matrix.ext }}" > "bin/smartwaker-${{ matrix.os_name }}-amd64${{ matrix.ext }}.sha256"
-          fi
+          shasum -a 256 "bin/smartwaker-${{ matrix.os_name }}-amd64${{ matrix.ext }}" > "bin/smartwaker-${{ matrix.os_name }}-amd64${{ matrix.ext }}.sha256"
+      
+      - name: Build (Windows)
+        if: matrix.os == 'windows-latest'
+        env:
+          CGO_ENABLED: 0
+          GOOS: ${{ matrix.os_name }}
+          GOARCH: amd64
+        shell: pwsh
+        run: |
+          $VERSION = $(git describe --tags --always --dirty='-dev')
+          $COMMIT_HASH = $(git rev-parse --short HEAD 2>$null)
+          $BUILD_DATE = $(Get-Date -UFormat "%Y-%m-%dT%H:%M:%SZ")
+          
+          go build -v -ldflags="-X 'main.version=$VERSION' -X 'main.commit=$COMMIT_HASH' -X 'main.date=$BUILD_DATE'" `
+            -o bin/smartwaker-${{ matrix.os_name }}-amd64${{ matrix.ext }} ./cmd
+          
+          # 创建校验和文件
+          Get-FileHash -Algorithm SHA256 -Path "bin/smartwaker-${{ matrix.os_name }}-amd64${{ matrix.ext }}" | `
+            Select-Object -ExpandProperty Hash | `
+            Out-File -FilePath "bin/smartwaker-${{ matrix.os_name }}-amd64${{ matrix.ext }}.sha256" -Encoding ASCII
       
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
