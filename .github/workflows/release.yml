@@ -66,7 +66,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: smartwaker-binaries
+          name: smartwaker-binaries-${{ matrix.os_name }}
           path: |
             bin/smartwaker-*
             bin/smartwaker-*.sha256
@@ -84,8 +84,9 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: smartwaker-binaries
           path: release
+          pattern: smartwaker-binaries-*
+          merge-multiple: true
       
       - name: Create Release
         id: create_release
