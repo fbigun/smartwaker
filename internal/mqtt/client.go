@@ -48,12 +48,17 @@ func (c *Client) Connect() error {
 }
 
 // Subscribe 订阅主题
-func (c *Client) Subscribe(topic string, qos byte) error {
+func (c *Client) Subscribe(topic string, qos byte, callback mqtt.MessageHandler) error {
 	if !c.isConnected {
 		return fmt.Errorf("mqtt client not connected")
 	}
 	
-	token := c.client.Subscribe(topic, qos, c.onMessage)
+	// 如果没有提供回调函数，则使用默认的消息处理函数
+	handler := c.onMessage
+	if callback != nil {
+		handler = callback
+	}
+	token := c.client.Subscribe(topic, qos, handler)
 	if token.Wait() && token.Error() != nil {
 		return fmt.Errorf("failed to subscribe to topic %s: %w", topic, token.Error())
 	}
