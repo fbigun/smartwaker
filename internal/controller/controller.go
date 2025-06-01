@@ -57,16 +57,19 @@ func (c *Controller) handleMessage(client mqtt.Client, msg mqtt.Message) {
 	// 格式示例: "wake:nas1" 或 "ping:nas1"
 	switch {
 	case command == "list":
-		c.listDevices()
+		go c.listDevices()
 	case len(command) >= 5 && command[:5] == "wake:":
 		deviceName := command[5:]
-		c.wakeDevice(deviceName)
+		go c.wakeDevice(deviceName)
 	case len(command) >= 5 && command[:5] == "ping:":
 		deviceName := command[5:]
-		c.pingDevice(deviceName)
+		go c.pingDevice(deviceName)
 	default:
 		log.Printf("Unknown command: %s", command)
 	}
+	
+	// 确保消息被标记为已处理
+	msg.Ack()
 }
 
 // listDevices 列出所有已配置的设备
