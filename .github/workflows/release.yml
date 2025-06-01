@@ -81,7 +81,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: smartwaker-binaries-${{ matrix.os_name }}
+          name: smartwaker-${{ matrix.os_name }}
           path: |
             bin/smartwaker-*
             bin/smartwaker-*.sha256
@@ -101,22 +101,19 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: release
-          pattern: smartwaker-binaries-*
+          pattern: smartwaker-*
           merge-multiple: true
       
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           name: Release ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
           body: |
             ## SmartWaker ${{ github.ref_name }}
-            
-            ### Changes
-            - Initial release
             
             ### Assets
             This release includes the following binaries:
