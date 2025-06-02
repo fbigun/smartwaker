@@ -1,0 +1,53 @@
+# Go 相关忽略
+# 编译生成的二进制文件
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# 测试二进制文件、测试覆盖率文件
+*.test
+*.out
+coverage.txt
+coverage.html
+
+# Go 工作区文件
+go.work
+
+# 依赖目录
+/vendor/
+
+# 本地构建目录
+/bin/
+/build/
+/dist/
+
+# IDE 和编辑器相关
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# 日志文件
+*.log
+
+# 环境变量文件
+.env
+.env.local
+
+# 配置文件（可能包含敏感信息）
+config.local.yaml
+config.dev.yaml
+config.prod.yaml
+*.pem
+*.key
+
+# 临时文件
+tmp/
+temp/
+
+# 特定于 SmartWaker 项目的忽略
+# 添加项目特定的忽略规则

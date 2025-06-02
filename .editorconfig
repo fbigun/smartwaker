@@ -1,0 +1,59 @@
+# EditorConfig 帮助在不同的编辑器和 IDE 之间保持一致的编码风格
+# https://editorconfig.org/
+
+# 顶层 EditorConfig 文件
+root = true
+
+# 所有文件的默认设置
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# Go 文件特定设置
+[*.go]
+indent_style = tab
+indent_size = 4
+
+# Makefile 需要使用制表符
+[Makefile]
+indent_style = tab
+
+# YAML 文件通常使用 2 空格缩进
+[*.{yaml,yml}]
+indent_size = 2
+
+# JSON 文件通常使用 2 空格缩进
+[*.json]
+indent_size = 2
+
+# Markdown 文件
+[*.md]
+trim_trailing_whitespace = false
+
+# Windows 批处理文件使用 CRLF
+[*.{cmd,bat,ps1}]
+end_of_line = crlf
+
+# 配置文件
+[*.{toml,ini}]
+indent_size = 2
+
+# HTML, CSS, JS 文件
+[*.{html,css,js}]
+indent_size = 2
+
+# 文档
+[*.txt]
+indent_size = 4
+
+# 协议缓冲区文件
+[*.proto]
+indent_size = 2
+
+# Shell 脚本
+[*.sh]
+indent_size = 2

@@ -1,0 +1,61 @@
+# 设置默认行为，以防人们没有设置core.autocrlf
+* text=auto
+
+# 明确声明应该被标准化的文本文件
+*.go text eol=lf
+*.mod text eol=lf
+*.sum text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.sh text eol=lf
+Makefile text eol=lf
+Dockerfile text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+
+# 二进制文件不应该被修改
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.tar binary
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+
+# Go 特定设置
+# 确保 Go 代码使用 LF 行尾，这是 Go 工具链的期望
+*.go linguist-language=Go
+
+# 文档文件
+*.md linguist-documentation
+*.txt linguist-documentation
+LICENSE linguist-documentation
+README* linguist-documentation
+
+# 忽略生成的文件
+/vendor/* linguist-vendored
+/bin/* linguist-generated
+/build/* linguist-generated
+/dist/* linguist-generated
+
+# 对于 Windows 脚本，保持 CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
